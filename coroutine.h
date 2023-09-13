@@ -18,6 +18,8 @@ struct coroutine {
     enum {
         STATUS_INVALID, STATUS_CREATED, STATUS_RUNNING, STATUS_DONE,
     } status;
+    // Exit value of this coroutine
+    void *exit_value;
 };
 
 /**
@@ -37,7 +39,7 @@ int coroutine_create(struct coroutine *c, size_t stack_size);
  * @return 0 if coroutine started and then either yielded or finished. 1 if it's not possible to run the
  * coroutine. For example a coroutine in RUNNING state is given as argument.
  */
-int coroutine_start(struct coroutine *c, void (f)(struct coroutine *, void *), void *argument);
+int coroutine_start(struct coroutine *c, void *(f)(struct coroutine *, void *), void *argument);
 
 /**
  * Continue the coroutine until it yields or finishes.
