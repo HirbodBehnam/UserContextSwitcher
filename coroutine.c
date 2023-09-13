@@ -23,7 +23,7 @@ static uint64_t initial_top_of_stack(struct coroutine *c) {
  * @param f The function to extract its address
  * @param stack Top of stack
  */
-static void extract_function_address(void (f)(void), char *stack) {
+static void extract_function_address(void (f)(struct coroutine *, void *), char *stack) {
     const uint64_t function_address = (uint64_t) f;
     const uint32_t low = function_address & UINT32_MAX, high = (function_address >> 32) & UINT32_MAX;
     uint32_t *casted_stack = (uint32_t *) stack;
@@ -31,7 +31,7 @@ static void extract_function_address(void (f)(void), char *stack) {
     casted_stack[1] = high;
 }
 
-extern void coroutine_start_inner(struct coroutine *c);
+extern void coroutine_start_inner(struct coroutine *c, void *);
 
 int coroutine_create(struct coroutine *c, size_t stack_size) {
     // Assert to don't fuck up in start_task_inner
@@ -48,14 +48,16 @@ int coroutine_create(struct coroutine *c, size_t stack_size) {
     c->stack_pointer = initial_top_of_stack(c);
     assert(c->stack_pointer % 16 == 0);
     c->return_stack_pointer = 0; // not needed but whatever
+    c->status = STATUS_CREATED;
     return 0;
 }
 
-void coroutine_start(struct coroutine *c, void (f)(void)) {
+void coroutine_start(struct coroutine *c, void (f)(struct coroutine *, void *), void *argument) {
     // Extract the address of function to execute
     extract_function_address(f, (char *) (c->stack_pointer));
     // Start it!
-    coroutine_start_inner(c);
+    c->status = STATUS_RUNNING;
+    coroutine_start_inner(c, argument);
 }
 
 void coroutine_free(struct coroutine *c) {
@@ -64,4 +66,5 @@ void coroutine_free(struct coroutine *c) {
     c->stack_size = 0;
     c->stack_pointer = 0;
     c->return_stack_pointer = 0;
+    c->status = STATUS_INVALID;
 }

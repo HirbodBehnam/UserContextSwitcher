@@ -14,6 +14,10 @@ struct coroutine {
     char *stack;
     // Size of the stack
     size_t stack_size;
+    // Status of this coroutine
+    enum {
+        STATUS_INVALID, STATUS_CREATED, STATUS_RUNNING, STATUS_DONE,
+    } status;
 };
 
 /**
@@ -27,9 +31,11 @@ int coroutine_create(struct coroutine *c, size_t stack_size);
 /**
  * Starts a task with a function
  * @param c The coroutine to start the function in
- * @param f The function to start executing
+ * @param f The function to start executing. The first argument will be the pointer to the coroutine, the
+ * second pointer is given by user in argument parameter.
+ * @param argument The argument to give to coroutine.
  */
-void coroutine_start(struct coroutine *c, void (f)(void));
+void coroutine_start(struct coroutine *c, void (f)(struct coroutine *, void *), void *argument);
 
 /**
  * Frees coroutine resources
