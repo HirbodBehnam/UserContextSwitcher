@@ -18,6 +18,8 @@ struct coroutine {
  * @return The RSP
  */
 uint64_t initial_top_of_stack(struct coroutine *c) {
+    // Remember that stack grows from top to bottom.
+    // First 8 bytes are function address
     uint64_t stack_pointer = (uint64_t) &(c->stack[COROUTINE_STACK_SIZE - 8]);
     // Read more: https://stackoverflow.com/a/51072200/4213397
     while (stack_pointer % 16 != 0)
@@ -57,8 +59,6 @@ int main() {
     _Static_assert(offsetof(struct coroutine, stack_pointer) == 8, "stack_pointer");
     _Static_assert(offsetof(struct coroutine, stack) == 16, "stack");
     printf("Hello, World!\n");
-    // Remember that stack grows from top to bottom.
-    // First 8 bytes are function address
     my_coroutine.stack_pointer = initial_top_of_stack(&my_coroutine);
     assert(my_coroutine.stack_pointer % 16 == 0);
     extract_function_address(&counter, (char *) (my_coroutine.stack_pointer));

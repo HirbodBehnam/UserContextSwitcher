@@ -10,9 +10,11 @@ start_task:
 	push rbx
 	push rcx
 	push rdx
+	push rbp
 	# Swap stack pointers
 	mov [rdi], rsp # Save main stack pointer
 	mov rsp, [rdi+8] # Load coroutine stack pointer
+	# We dont care about the base pointer here
 	ret # This return will make a jump to coroutine
 
 .globl switch_to_task
@@ -23,10 +25,12 @@ switch_to_task:
 	push rbx
 	push rcx
 	push rdx
+	push rbp
 	# Swap stack pointers
 	mov [rdi], rsp # Save main stack pointer
 	mov rsp, [rdi+8] # Load coroutine stack pointer
 	# Restore registers
+	pop rbp
 	pop rdx
     pop rcx
     pop rbx
@@ -41,10 +45,12 @@ yield_task:
     push rbx
     push rcx
     push rdx
+    push rbp
     # Swap stack pointers
 	mov [rdi+8], rsp # Save coroutine stack pointer
 	mov rsp, [rdi] # Load main stack pointer
 	# Restore registers
+	pop rbp
 	pop rdx
 	pop rcx
 	pop rbx
