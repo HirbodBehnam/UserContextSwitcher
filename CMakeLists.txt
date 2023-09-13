@@ -6,6 +6,6 @@ SET(CMAKE_ASM_FLAGS "${CFLAGS} ${ASM_OPTIONS}")
 
 add_executable(UserContextSwitcher
         main.c
-        switch.s
+        switch.S
         coroutine.c)
 target_compile_options(UserContextSwitcher PRIVATE -masm=intel)

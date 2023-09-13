@@ -1,5 +1,7 @@
 # Context switch.
 # Read more here: https://wiki.osdev.org/System_V_ABI#x86-64
+#include "coroutine_offsets.h"
+
 .text
 .align 8
 .intel_syntax noprefix
@@ -13,16 +15,16 @@ coroutine_start_inner:
 	push rdx
 	push rbp
 	# Swap stack pointers
-	mov [rdi], rsp # Save main stack pointer
-	mov rsp, [rdi+8] # Load coroutine stack pointer
+	mov [rdi+RETURN_STACK_POINTER_OFFSET], rsp # Save main stack pointer
+	mov rsp, [rdi+COROUTINE_STACK_POINTER_OFFSET] # Load coroutine stack pointer
 	# We dont care about the base pointer here
 	# rdi is the pointer to coroutine struct
 	# rsi is the pointer to the argument
 	ret # This return will make a jump to coroutine
 
-.globl coroutine_continue
-.type coroutine_continue, @function
-coroutine_continue:
+.globl coroutine_continue_inner
+.type coroutine_continue_inner, @function
+coroutine_continue_inner:
 	# Save all registers
 	push rax
 	push rbx
@@ -30,8 +32,8 @@ coroutine_continue:
 	push rdx
 	push rbp
 	# Swap stack pointers
-	mov [rdi], rsp # Save main stack pointer
-	mov rsp, [rdi+8] # Load coroutine stack pointer
+	mov [rdi+RETURN_STACK_POINTER_OFFSET], rsp # Save main stack pointer
+	mov rsp, [rdi+COROUTINE_STACK_POINTER_OFFSET] # Load coroutine stack pointer
 	# Restore registers
 	pop rbp
 	pop rdx
@@ -50,8 +52,8 @@ coroutine_yield:
 	push rdx
 	push rbp
 	# Swap stack pointers
-	mov [rdi+8], rsp # Save coroutine stack pointer
-	mov rsp, [rdi] # Load main stack pointer
+	mov [rdi+COROUTINE_STACK_POINTER_OFFSET], rsp # Save coroutine stack pointer
+	mov rsp, [rdi+RETURN_STACK_POINTER_OFFSET] # Load main stack pointer
 	# Restore registers
 	pop rbp
 	pop rdx

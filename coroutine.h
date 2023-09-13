@@ -34,8 +34,18 @@ int coroutine_create(struct coroutine *c, size_t stack_size);
  * @param f The function to start executing. The first argument will be the pointer to the coroutine, the
  * second pointer is given by user in argument parameter.
  * @param argument The argument to give to coroutine.
+ * @return 0 if coroutine started and then either yielded or finished. 1 if it's not possible to run the
+ * coroutine. For example a coroutine in RUNNING state is given as argument.
  */
-void coroutine_start(struct coroutine *c, void (f)(struct coroutine *, void *), void *argument);
+int coroutine_start(struct coroutine *c, void (f)(struct coroutine *, void *), void *argument);
+
+/**
+ * Continue the coroutine until it yields or finishes.
+ * @param c The coroutine to continue or yield
+ * @return 0 if the coroutine yielded or finished. Otherwise 1. 1 Means that the status of the coroutine
+ * is not STATUS_RUNNING.
+ */
+int coroutine_continue(struct coroutine *c);
 
 /**
  * Frees coroutine resources
@@ -44,7 +54,6 @@ void coroutine_start(struct coroutine *c, void (f)(struct coroutine *, void *), 
 void coroutine_free(struct coroutine *c);
 
 // Assembly functions
-extern void coroutine_continue(struct coroutine *c);
 
 extern void coroutine_yield(struct coroutine *this);
 
