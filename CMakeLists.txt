@@ -4,5 +4,8 @@ project(UserContextSwitcher C ASM)
 set(CMAKE_C_STANDARD 11)
 SET(CMAKE_ASM_FLAGS "${CFLAGS} ${ASM_OPTIONS}")
 
-add_executable(UserContextSwitcher switch.s main.c)
+add_executable(UserContextSwitcher
+        main.c
+        switch.s
+        coroutine.c)
 target_compile_options(UserContextSwitcher PRIVATE -masm=intel)
