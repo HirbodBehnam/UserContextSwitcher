@@ -2,28 +2,29 @@
 #include "coroutine.h"
 
 void *counter(struct coroutine *this, void *arg) {
-    printf("arg is %p\n", arg);
-    for (int i = 0; i < 10; i++) {
-        printf("counter %d\n", i);
+    for (int i = 0; i < 3; i++) {
+        printf("%p: counter %d\n", arg, i);
         coroutine_yield(this);
     }
-    printf("Yielding one last time!\n");
-    coroutine_yield(this);
-    puts("Exiting...");
-    return (void *) 0x100;
+    return NULL;
 }
 
 // Main functions
 int main() {
-    struct coroutine my_coroutine;
-    printf("Hello, World!\n");
-    coroutine_create(&my_coroutine, 1024 * 1024);
-    // Jump to it!
-    coroutine_start(&my_coroutine, counter, (void *) 0x200);
-    while (my_coroutine.status != STATUS_DONE)
-        coroutine_continue(&my_coroutine);
-    printf("Done!\n");
-    printf("Exited with %p\n", my_coroutine.exit_value);
-    coroutine_free(&my_coroutine);
+    struct coroutine coroutine1, coroutine2;
+    puts("Starting scheduler...");
+    coroutine_create(&coroutine1, 1024 * 1024);
+    coroutine_create(&coroutine2, 1024 * 1024);
+    // Start both of them
+    coroutine_start(&coroutine1, counter, (void *) 0x1);
+    coroutine_start(&coroutine2, counter, (void *) 0x2);
+    while (coroutine1.status != STATUS_DONE) {
+        coroutine_continue(&coroutine1);
+        coroutine_continue(&coroutine2);
+    }
+    puts("Done!");
+    printf("Exited with %p and %p\n", coroutine1.exit_value, coroutine2.exit_value);
+    coroutine_free(&coroutine1);
+    coroutine_free(&coroutine2);
     return 0;
 }

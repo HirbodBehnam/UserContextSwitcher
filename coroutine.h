@@ -34,7 +34,8 @@ int coroutine_create(struct coroutine *c, size_t stack_size);
  * Starts a task with a function
  * @param c The coroutine to start the function in
  * @param f The function to start executing. The first argument will be the pointer to the coroutine, the
- * second pointer is given by user in argument parameter.
+ * second pointer is given by user in argument parameter. This function might optionally return something
+ * and later it can be seen in c->exit_value
  * @param argument The argument to give to coroutine.
  * @return 0 if coroutine started and then either yielded or finished. 1 if it's not possible to run the
  * coroutine. For example a coroutine in RUNNING state is given as argument.
@@ -57,6 +58,10 @@ void coroutine_free(struct coroutine *c);
 
 // Assembly functions
 
+/**
+ * Yield this current coroutine
+ * @param this The coroutine to yield
+ */
 extern void coroutine_yield(struct coroutine *this);
 
 #endif //USERCONTEXTSWITCHER_COROUTINE_H

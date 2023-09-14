@@ -30,8 +30,8 @@ coroutine_start_inner:
 	# Save all registers
 	save_context
 	# Swap stack pointers
-	mov [rdi + RETURN_STACK_POINTER_OFFSET], rsp # Save main stack pointer
-	mov rsp, [rdi + COROUTINE_STACK_POINTER_OFFSET] # Load coroutine stack pointer
+	mov [rdi + RETURN_STACK_POINTER_OFFSET], rsp # save main stack pointer
+	mov rsp, [rdi + COROUTINE_STACK_POINTER_OFFSET] # load coroutine stack pointer
 	# We dont care about the base pointer here
 	# rdi is the pointer to coroutine struct
 	# rsi is the pointer to the argument
@@ -43,11 +43,11 @@ coroutine_continue_inner:
 	# Save all registers
 	save_context
 	# Swap stack pointers
-	mov [rdi + RETURN_STACK_POINTER_OFFSET], rsp # Save main stack pointer
-	mov rsp, [rdi + COROUTINE_STACK_POINTER_OFFSET] # Load coroutine stack pointer
+	mov [rdi + RETURN_STACK_POINTER_OFFSET], rsp # save main stack pointer
+	mov rsp, [rdi + COROUTINE_STACK_POINTER_OFFSET] # load coroutine stack pointer
 	# Restore registers
 	restore_context
-	ret # This return will make a jump to coroutine
+	ret # this return will make a jump to coroutine
 
 .globl coroutine_yield
 .type coroutine_yield, @function
@@ -55,11 +55,11 @@ coroutine_yield:
 	# Store task registers
 	save_context
 	# Swap stack pointers
-	mov [rdi + COROUTINE_STACK_POINTER_OFFSET], rsp # Save coroutine stack pointer
-	mov rsp, [rdi + RETURN_STACK_POINTER_OFFSET] # Load main stack pointer
+	mov [rdi + COROUTINE_STACK_POINTER_OFFSET], rsp # save coroutine stack pointer
+	mov rsp, [rdi + RETURN_STACK_POINTER_OFFSET] # load main stack pointer
 	# Restore registers
 	restore_context
-	ret # Return to main program
+	ret # return to main program
 
 .globl coroutine_finish
 .type coroutine_finish, @function

@@ -50,7 +50,7 @@ int coroutine_create(struct coroutine *c, size_t stack_size) {
     _Static_assert(offsetof(struct coroutine, exit_value) == COROUTINE_EXIT_VALUE_OFFSET, "exit_value");
     _Static_assert(COROUTINE_STATUS_DONE_VALUE == STATUS_DONE, "status value");
     // Allocate stack
-    char *stack = malloc(stack_size);
+    char *stack = calloc(stack_size, sizeof(char));
     if (stack == NULL)
         return 1;
     // Set result
